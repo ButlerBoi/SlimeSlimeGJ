@@ -1,0 +1,152 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.SceneManagement;
+
+
+public class PlayerMovement2 : MonoBehaviour {
+
+    [SerializeField] private LayerMask platformsLayerMask;
+    [SerializeField] private LayerMask platformsLayerMask1;
+    [SerializeField] private LayerMask platformsLayerMask2;
+    public float moveSpeed = 1.0f;
+    public float jumpVel = 10.0f;
+    public float wallJumpVel = 12.0f;
+    private Rigidbody2D rigidbody2d;
+    private BoxCollider2D boxCollider2d;
+    public Animator anim;
+    private RaycastHit2D raycastHit2d;
+    private RaycastHit2D raycastHit2d1;
+    private RaycastHit2D raycastHit2d2;
+    public GameObject slimeSplash;
+    public GameObject splashLoc;
+
+
+    // Start is called before the first frame update
+    void Start()
+    {
+        rigidbody2d = transform.GetComponent<Rigidbody2D>();
+        boxCollider2d = transform.GetComponent<BoxCollider2D>();
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        
+
+        if (IsGrounded() && Input.GetKey("up"))
+        {
+            rigidbody2d.velocity = Vector2.up * jumpVel;
+            Instantiate(slimeSplash, splashLoc.transform.position, Quaternion.identity);
+            AudioManager.PlaySound("slimeJump");
+        }
+
+
+        if ((IsWalledLeft() && Input.GetKeyDown("up")) || (IsWalledRight() && Input.GetKeyDown("up")))
+        {
+            rigidbody2d.velocity = Vector2.up * wallJumpVel;
+            AudioManager.PlaySound("slimeStick");
+            Instantiate(slimeSplash, splashLoc.transform.position, Quaternion.identity);
+        }
+
+        if (!IsGrounded())
+        {
+            anim.SetBool("jump", true);
+
+        }
+        else anim.SetBool("jump", false);
+        HandleMovement();
+    }
+
+    private bool IsGrounded()
+    {
+        float extraHeight = 0.1f;
+        RaycastHit2D raycastHit2d = Physics2D.BoxCast(boxCollider2d.bounds.center, boxCollider2d.bounds.size, 0.0f, Vector2.down, extraHeight, platformsLayerMask);
+        Debug.DrawRay(boxCollider2d.bounds.center, Vector2.down * (boxCollider2d.bounds.extents.y + extraHeight));
+        // Debug.Log(raycastHit2d.collider);
+
+        return raycastHit2d.collider != null;
+    }
+    private bool IsWalledRight()
+    {
+        float extraHeight = 0.1f;
+        raycastHit2d1 = Physics2D.BoxCast(boxCollider2d.bounds.center, boxCollider2d.bounds.size, 0.0f, Vector2.right, extraHeight, platformsLayerMask1);
+        Debug.DrawRay(boxCollider2d.bounds.center, Vector2.right * (boxCollider2d.bounds.extents.x + extraHeight));
+       // Debug.Log(raycastHit2d.collider);
+        return raycastHit2d1.collider != null;
+    }
+    private bool IsWalledLeft()
+    {
+        float extraHeight = 0.1f;
+        raycastHit2d2 = Physics2D.BoxCast(boxCollider2d.bounds.center, boxCollider2d.bounds.size, 0.0f, Vector2.left, extraHeight, platformsLayerMask2);
+        Debug.DrawRay(boxCollider2d.bounds.center, Vector2.left * (boxCollider2d.bounds.extents.x + extraHeight));
+        //Debug.Log(raycastHit2d.collider);
+        return raycastHit2d2.collider != null;
+    }
+    private void HandleMovement()
+    {
+
+        rigidbody2d.constraints = RigidbodyConstraints2D.FreezeRotation;
+        if (Input.GetKey(KeyCode.LeftArrow)) {
+            rigidbody2d.velocity = new Vector2(-moveSpeed, rigidbody2d.velocity.y);
+            transform.localScale = new Vector2(1.0f, 1.0f);
+        }
+        else {
+            if (Input.GetKey(KeyCode.RightArrow)){
+                rigidbody2d.velocity = new Vector2(+moveSpeed, rigidbody2d.velocity.y);
+                transform.localScale = new Vector2(-1.0f, 1.0f);
+            }
+            else {
+                rigidbody2d.velocity = new Vector2(0, rigidbody2d.velocity.y);
+                rigidbody2d.constraints = RigidbodyConstraints2D.FreezePositionX | RigidbodyConstraints2D.FreezeRotation;
+            }
+        }
+    }
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.tag == "Enemy")
+        {
+            SceneManager.LoadScene(1);
+        }
+        if (collision.tag == "EnemyHard")
+        {
+            SceneManager.LoadScene(2);
+        }
+
+        if (collision.tag == "EnemyImp")
+        {
+            SceneManager.LoadScene(3);
+        }
+
+        if (collision.tag == "EnemyFall")
+        {
+            SceneManager.LoadScene(4);
+        }
+        if (collision.tag == "EnemyRandom")
+        {
+            SceneManager.LoadScene(5);
+        }
+        if (collision.tag == "switch")
+        {
+            SceneManager.LoadScene(2);
+        }
+
+        if (collision.tag == "switch1")
+        {
+            SceneManager.LoadScene(3);
+        }
+
+        if (collision.tag == "switch2")
+        {
+            SceneManager.LoadScene(4);
+        }
+
+        if (collision.tag == "switch3")
+        {
+            SceneManager.LoadScene(5);
+        }
+
+
+
+    }
+}
