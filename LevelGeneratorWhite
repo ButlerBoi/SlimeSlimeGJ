@@ -1,0 +1,47 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class LevelGeneratorWhite : MonoBehaviour
+{
+    private const float PLAYER_DISTANCE_SPAWN_LEVEL_PART = 15f;
+    [SerializeField] private Transform LevelPart_Start;
+    [SerializeField] private List<Transform> LevelPartList;
+    [SerializeField] private Transform player;
+
+    private Vector3 lastEndPosition;
+    private void Awake()
+    {
+        lastEndPosition = LevelPart_Start.Find("EndPositionWhite").position;
+        SpawnLevelPart();
+        int startingSpawnLevelParts = 5;
+        for (int i = 0; i < startingSpawnLevelParts; i++)
+            SpawnLevelPart();
+
+    }
+
+    private void SpawnLevelPart()
+    {
+        Transform chosenLevelPart = LevelPartList[Random.Range(0, LevelPartList.Count)];
+        Transform lastLevelPartTransform = SpawnLevelPart(chosenLevelPart, lastEndPosition);
+        lastEndPosition = lastLevelPartTransform.Find("EndPositionWhite").position;
+    }
+
+    private Transform SpawnLevelPart(Transform levelPart, Vector3 spawnPosition)
+    {
+        Transform levelPartTransform = Instantiate(levelPart, spawnPosition, Quaternion.identity);
+        return levelPartTransform;
+
+    }
+
+
+    // Update is called once per frame
+    void Update()
+    {
+        if (Vector3.Distance(player.position, lastEndPosition) < PLAYER_DISTANCE_SPAWN_LEVEL_PART)
+        {
+            //spawn another level
+            SpawnLevelPart();
+        }
+    }
+}
