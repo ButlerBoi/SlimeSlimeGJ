@@ -1,0 +1,39 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class AudioManager : MonoBehaviour
+{
+    public static AudioClip playerJump, playerlandSound, playerstickSound;
+    static AudioSource audioSource;
+    // Start is called before the first frame update
+    void Start()
+    {
+        playerlandSound = Resources.Load<AudioClip>("slimeLand");
+        playerstickSound = Resources.Load<AudioClip>("slimeStick");
+        playerJump = Resources.Load<AudioClip>("slimeJump");
+
+        audioSource = GetComponent<AudioSource>();
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+
+    }
+    public static void PlaySound(string clip)
+    {
+        switch (clip)
+        {
+            case "slimeLand":
+                audioSource.PlayOneShot(playerlandSound);
+                break;
+            case "slimeStick":
+                audioSource.PlayOneShot(playerstickSound);
+                break;
+            case "slimeJump":
+                audioSource.PlayOneShot(playerJump);
+                break;
+        }
+    }
+}
